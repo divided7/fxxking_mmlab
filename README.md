@@ -1,5 +1,20 @@
 # fxxking_mmlab
 
+## MMPose
+### 场景1. 需要将预训练模型导出onnx
+* 根据config配置文件获取到模型的前处理信息
+* 在推理脚本中定位到process_one_image，在该函数中可以找到推理的模型。以RTMPose为例，存在一个inference_topdown函数，内部调用了model.test_step(batch)，这里的model是继承于nn.Module的方法，可以直接export
+
+
+### 场景2. 需要修改模型结构，在不训练的情况下直接导出onnx
+* 找到训练脚本 例如`tools/train.py`
+* 复制`train.py`为`export_model.py`, 修改`export_model.py`末端的`runner.train()`，改为`model = runner.model`, 得到的model即为继承于nn.Module的模型。
+* 修改config文件中的custom_imports，例如rtmpose3d的路径是/PATH/TO/MMPOSE/projects/rtmpose3d/rtmpose3d, 则改成dict(imports=['projects.rtmpose3d.rtmpose3d'], allow_failed_imports=False)
+* ```bash
+  export PYTHONPATH=/app/luyuxi/mmpose_20250818_for_rtmpose3d/projects:$PYTHONPATH
+  python tools/export_model.py xxx_config.py
+  ```
+
 ## MMdeploy
 
 ### Reqiurements:
